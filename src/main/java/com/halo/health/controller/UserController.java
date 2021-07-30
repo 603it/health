@@ -88,7 +88,7 @@ public class UserController {
         if (!changePasswordReq.getNewPassword1().equals(changePasswordReq.getNewPassword2())) {
             throw new HaloMallException(HaloMallExceptionEnum.NEW_PASSWORD_SAME);
         }
-        userService.changePassword(changePasswordReq.getNewPassword1());
+        userService.changePassword(changePasswordReq);
         return ApiRestResponse.success();
     }
 

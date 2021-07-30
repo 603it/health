@@ -41,7 +41,6 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
     public Analysis analysis(HealthAnalysisReq healthAnalysisReq) {
         StringBuilder analysisString = new StringBuilder();
         User user = userService.getById(UserFilter.currentUser.getId());
-        //分析算法咋个写
         //人体正常情况下体温都是正常的，所以将正常体温提至if判断里面,满足此条件，后面的条件将不在判断，提升性能
         if (healthAnalysisReq.getTemperature() >= 35.8 && healthAnalysisReq.getTemperature() <= 37.6) {
             analysisString.append("体温正常！平时还是要注意休息，常运动哦！");
@@ -55,6 +54,7 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
             analysisString.append("体温异常！体温异常！请立即就医！请立即就医！！！");
         }
 
+        //
 
 
 

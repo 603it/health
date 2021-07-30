@@ -9,6 +9,7 @@ import com.halo.health.exception.HaloMallExceptionEnum;
 import com.halo.health.filter.UserFilter;
 import com.halo.health.model.dao.UserMapper;
 import com.halo.health.model.pojo.User;
+import com.halo.health.model.request.ChangePasswordReq;
 import com.halo.health.model.request.UpdateUserReq;
 import com.halo.health.model.vo.AnalysisVO;
 import com.halo.health.model.vo.UserAndAnalysisVO;
@@ -80,14 +81,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public void changePassword(String newPassword) {
-        User currentUser = UserFilter.currentUser;
-        if (currentUser != null) {
-            currentUser.setPassword(newPassword);
-            userMapper.updateById(currentUser);
-        }else {
-            throw new HaloMallException(HaloMallExceptionEnum.UPDATE_FAILED);
+    public void changePassword(ChangePasswordReq changePasswordReq) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id",UserFilter.currentUser.getId())
+                .eq("password", Md5Util.jm(changePasswordReq.getPassword()));
+        User currentUser = userMapper.selectOne(queryWrapper);
+        if (currentUser == null) {
+            throw new HaloMallException(HaloMallExceptionEnum.FAIL_PASSWORD);
         }
+        currentUser.setPassword(Md5Util.jm(changePasswordReq.getNewPassword1()));
+        userMapper.updateById(currentUser);
     }
 
     @Override

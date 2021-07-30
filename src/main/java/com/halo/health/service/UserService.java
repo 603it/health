@@ -3,6 +3,7 @@ package com.halo.health.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.halo.health.model.pojo.User;
+import com.halo.health.model.request.ChangePasswordReq;
 import com.halo.health.model.request.UpdateUserReq;
 import com.halo.health.model.vo.UserAndAnalysisVO;
 
@@ -19,7 +20,7 @@ public interface UserService extends IService<User> {
 
     void updateInformation(UpdateUserReq updateUserReq);
 
-    void changePassword(String newPassword);
+    void changePassword(ChangePasswordReq changePasswordReq);
 
     IPage<User> listOfUser(Integer pageNum, Integer pageSize);
 
