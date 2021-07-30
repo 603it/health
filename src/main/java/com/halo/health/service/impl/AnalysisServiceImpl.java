@@ -75,19 +75,13 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
     @Override
     public Pageing<AnalysisVO> list(Integer pageNum, Integer pageSize) {
         //分页查询
-        QueryWrapper<Analysis> wrapper = new QueryWrapper<>();
-        wrapper.orderByDesc("create_time")
-                .eq("user_id", UserFilter.currentUser.getId());
         Page<Analysis> page = new Page<>(pageNum, pageSize);
-        IPage<Analysis> analysisIPage = analysisMapper.selectPage(page, wrapper);
+        IPage<Analysis> analysisIPage = analysisMapper.selectPage(page, new QueryWrapper<Analysis>()
+                .orderByDesc("create_time")
+                .eq("user_id", UserFilter.currentUser.getId()));
 
         //去掉一些不需要返回给前端的字段
-        List<AnalysisVO> analysisVOList = new ArrayList<>();
-        analysisIPage.getRecords().forEach(analysis -> {
-            AnalysisVO analysisVO = new AnalysisVO();
-            BeanUtils.copyProperties(analysis, analysisVO);
-            analysisVOList.add(analysisVO);
-        });
+        List<AnalysisVO> analysisVOList = listTransformation(analysisIPage.getRecords());
 
         //统一分页对象封装
         Pageing<AnalysisVO> pageVO = new Pageing<>();
@@ -107,6 +101,24 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
         wrapper.orderByDesc("create_time");
         Page<Analysis> page = new Page<>(pageNum, pageSize);
         return analysisMapper.selectPage(page, wrapper);
+    }
+
+    @Override
+    public List<AnalysisVO> listForUser(Integer userId) {
+
+        List<Analysis> analysisList = analysisMapper.selectList(new QueryWrapper<Analysis>().eq("user_id", userId));
+        //去掉一些不需要返回给前端的字段
+        return listTransformation(analysisList);
+    }
+
+    private List<AnalysisVO> listTransformation(List<Analysis> analysisList) {
+        List<AnalysisVO> analysisVOList = new ArrayList<>();
+        analysisList.forEach(analysis -> {
+            AnalysisVO analysisVO = new AnalysisVO();
+            BeanUtils.copyProperties(analysis, analysisVO);
+            analysisVOList.add(analysisVO);
+        });
+        return analysisVOList;
     }
 }
 

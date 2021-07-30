@@ -23,6 +23,7 @@ public class UserFilterConfig {
         filterRegistrationBean.addUrlPatterns("/health/*");
         filterRegistrationBean.addUrlPatterns("/user/update");
         filterRegistrationBean.addUrlPatterns("/user/getInfo");
+        filterRegistrationBean.addUrlPatterns("/user/changePassword");
         filterRegistrationBean.setName("userFilterConf");
         return filterRegistrationBean;
     }

@@ -2,9 +2,11 @@ package com.halo.health.controller;
 
 import com.halo.health.common.ApiRestResponse;
 import com.halo.health.common.Constant;
+import com.halo.health.exception.HaloMallException;
 import com.halo.health.exception.HaloMallExceptionEnum;
 import com.halo.health.filter.UserFilter;
 import com.halo.health.model.pojo.User;
+import com.halo.health.model.request.ChangePasswordReq;
 import com.halo.health.model.request.UpdateUserReq;
 import com.halo.health.service.UserService;
 import io.swagger.annotations.Api;
@@ -63,13 +65,30 @@ public class UserController {
     @ApiOperation("查看用户详细信息")
     @GetMapping("/user/getInfo")
     public User getInfo() {
-        return userService.getBaseMapper().selectById(UserFilter.currentUser.getId());
+        return UserFilter.currentUser;
     }
 
     @ApiOperation("更新用户信息")
     @PostMapping("/user/update")
     public ApiRestResponse updateUserInfo(@RequestBody @Valid UpdateUserReq updateUserReq) {
         userService.updateInformation(updateUserReq);
+        return ApiRestResponse.success();
+    }
+
+    @ApiOperation("更新用户密码")
+    @PostMapping("/user/changePassword")
+    public ApiRestResponse changePassword(@RequestBody @Valid ChangePasswordReq changePasswordReq) {
+        //参数校验
+        if (changePasswordReq.getPassword().equals(changePasswordReq.getNewPassword1())) {
+            throw new HaloMallException(HaloMallExceptionEnum.PASSWORD_SAME);
+        }
+        if (changePasswordReq.getNewPassword1().length() < 8) {
+            throw new HaloMallException(HaloMallExceptionEnum.PASSWORD_TOO_SHORT);
+        }
+        if (!changePasswordReq.getNewPassword1().equals(changePasswordReq.getNewPassword2())) {
+            throw new HaloMallException(HaloMallExceptionEnum.NEW_PASSWORD_SAME);
+        }
+        userService.changePassword(changePasswordReq.getNewPassword1());
         return ApiRestResponse.success();
     }
 

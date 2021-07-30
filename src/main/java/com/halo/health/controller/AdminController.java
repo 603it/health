@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.halo.health.common.ApiRestResponse;
 import com.halo.health.model.pojo.Analysis;
 import com.halo.health.model.pojo.User;
+import com.halo.health.model.vo.UserAndAnalysisVO;
 import com.halo.health.service.AnalysisService;
 import com.halo.health.service.UserService;
 import io.swagger.annotations.Api;
@@ -43,9 +44,9 @@ public class AdminController {
 
     @ApiOperation("查看用户信息")
     @GetMapping("/getUserInfo")
-    public ApiRestResponse getUserInfo(@RequestParam Integer userId) {
-        User user = userService.getBaseMapper().selectById(userId);
-        return ApiRestResponse.success(user);
+    public ApiRestResponse getUserInfo(@RequestParam String username) {
+        UserAndAnalysisVO userInfoDetail = userService.getUserInfoDetail(username);
+        return ApiRestResponse.success(userInfoDetail);
     }
 
 

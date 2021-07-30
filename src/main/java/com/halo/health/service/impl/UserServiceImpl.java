@@ -7,15 +7,20 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.halo.health.exception.HaloMallException;
 import com.halo.health.exception.HaloMallExceptionEnum;
 import com.halo.health.filter.UserFilter;
-import com.halo.health.model.pojo.User;
 import com.halo.health.model.dao.UserMapper;
+import com.halo.health.model.pojo.User;
 import com.halo.health.model.request.UpdateUserReq;
+import com.halo.health.model.vo.AnalysisVO;
+import com.halo.health.model.vo.UserAndAnalysisVO;
+import com.halo.health.service.AnalysisService;
 import com.halo.health.service.UserService;
 import com.halo.health.util.Md5Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  *
@@ -26,6 +31,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Autowired
     UserMapper userMapper;
+
+    @Autowired
+    AnalysisService analysisService;
 
     @Override
     public boolean checkAdminRole(User user) {
@@ -72,11 +80,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    public void changePassword(String newPassword) {
+        User currentUser = UserFilter.currentUser;
+        if (currentUser != null) {
+            currentUser.setPassword(newPassword);
+            userMapper.updateById(currentUser);
+        }else {
+            throw new HaloMallException(HaloMallExceptionEnum.UPDATE_FAILED);
+        }
+    }
+
+    @Override
     public IPage<User> listOfUser(Integer pageNum, Integer pageSize) {
         //分页查询
         Page<User> page = new Page<>(pageNum, pageSize);
         IPage<User> analysisIPage = userMapper.selectPage(page, null);
         return analysisIPage;
+    }
+
+    @Override
+    public UserAndAnalysisVO getUserInfoDetail(String username) {
+        User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
+        if (user == null) {
+            throw new HaloMallException(HaloMallExceptionEnum.NO_USER);
+        }
+        List<AnalysisVO> analysisVOS = analysisService.listForUser(user.getId());
+        UserAndAnalysisVO userAndAnalysisVO = new UserAndAnalysisVO();
+        BeanUtils.copyProperties(user, userAndAnalysisVO);
+        userAndAnalysisVO.setAnalysisVOList(analysisVOS);
+        return userAndAnalysisVO;
     }
 
 }
