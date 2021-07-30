@@ -40,29 +40,43 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
     @Override
     public Analysis analysis(HealthAnalysisReq healthAnalysisReq) {
         StringBuilder analysisString = new StringBuilder();
-        User user = userService.getById(UserFilter.currentUser.getId());
+
+        //血氧正常范围在90-100，越高越好，就算血氧测出高于100也只是偶尔情况，并不能长期保持。这里不做分析！
+        if (healthAnalysisReq.getBloodOxygen() >= 90) {
+            analysisString.append("血氧正常！");
+        } else {
+            analysisString.append("血氧饱和度低于90! 需要进行吸氧，建议就医 积极配合医生查找引起血氧饱和度降低的原因！");
+        }
+
+        //心率的正常范围在60-100
+        if (healthAnalysisReq.getHeartRate() >= 60 && healthAnalysisReq.getHeartRate() < 100) {
+            analysisString.append("心率正常！");
+        } else if (healthAnalysisReq.getHeartRate() < 50) {
+            analysisString.append("心率低于50，除非你是运动员或长期从事重体力劳动，或者你在睡觉。如果有明显的不适症状，比如胸闷、呼吸困难、心率偏快，突然之间近期出现心率减慢这种情况，就要进一步查明导致心率减慢的原因，比如是否由于发生甲状腺功能减退、高钾血症，因为这些情况都可能继发引起心率减慢。建议就医做心电图进一步检查");
+        } else if (healthAnalysisReq.getHeartRate() < 60) {
+            analysisString.append("心率低于60属于心动过速！ 注意生活规律，不能过度劳累，适当加强体育锻炼，吃饭时切忌吃得太多，否则心脏血流不通畅，心跳也会减缓，每天可以适当喝些白开水，对身体也很有好处。");
+        } else {
+            analysisString.append("心率高于100属于心动过速，常在剧烈运动及情绪激动以后出现。如果你长期心动过速，就需要结合病史，通过心电图的检查，在医生的指导下明确诊断又有效的药物进行调整治疗，使心率恢复到正常范围之内。");
+        }
+
         //人体正常情况下体温都是正常的，所以将正常体温提至if判断里面,满足此条件，后面的条件将不在判断，提升性能
         if (healthAnalysisReq.getTemperature() >= 35.8 && healthAnalysisReq.getTemperature() <= 37.6) {
-            analysisString.append("体温正常！平时还是要注意休息，常运动哦！");
+            analysisString.append("体温正常！");
         } else if (healthAnalysisReq.getTemperature() < 35) {
             analysisString.append("体温低于35度!!! 属于低体温症，请及时就医！");
-        } else if(healthAnalysisReq.getTemperature() < 35.8){
-            analysisString.append("体温过低！应适当保暖，服用能量较高的、易消化的食物，比如巧克力、糖类");
-        }else if(healthAnalysisReq.getTemperature() < 38) {
+        } else if (healthAnalysisReq.getTemperature() < 35.8) {
+            analysisString.append("体温过低！应适当保暖，服用能量较高的、易消化的食物，比如巧克力、糖类。");
+        } else if (healthAnalysisReq.getTemperature() < 38) {
             analysisString.append("体温有点高呀！身体有点低热，多喝热水，注意休息，适当采取物理降温方式，必要时可以吃点退烧药！");
-        }else {
+        } else {
             analysisString.append("体温异常！体温异常！请立即就医！请立即就医！！！");
         }
 
-        //
-
-
-
-        //
+        //封装analysis对象将他插入到表中
         Analysis analysis = new Analysis();
         BeanUtils.copyProperties(healthAnalysisReq, analysis);
         analysis.setUserId(UserFilter.currentUser.getId());
-        analysis.setProposal("多喝热水！！！");
+        analysis.setProposal(analysisString.toString());
         analysis.setCreateTime(new Date());
         int insert = analysisMapper.insert(analysis);
         if (insert == 0) {
