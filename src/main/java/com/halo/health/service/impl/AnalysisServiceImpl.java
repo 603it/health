@@ -40,11 +40,11 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
     @Override
     public Analysis analysis(HealthAnalysisReq healthAnalysisReq) {
         StringBuilder analysisString = new StringBuilder();
-        boolean flag = false;
+        int flag = 0;
         //血氧正常范围在90-100，越高越好，就算血氧测出高于100也只是偶尔情况，并不能长期保持。这里不做分析！
         if (healthAnalysisReq.getBloodOxygen() >= 90) {
             analysisString.append("血氧正常！");
-            flag = true;
+            flag++;
         } else {
             analysisString.append("血氧饱和度低于90! 需要进行吸氧，建议就医 积极配合医生查找引起血氧饱和度降低的原因！");
         }
@@ -52,7 +52,7 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
         //心率的正常范围在60-100
         if (healthAnalysisReq.getHeartRate() >= 60 && healthAnalysisReq.getHeartRate() < 100) {
             analysisString.append("心率正常！");
-            flag = true;
+            flag++;
         } else if (healthAnalysisReq.getHeartRate() < 50) {
             analysisString.append("心率低于50，除非你是运动员或长期从事重体力劳动，或者你在睡觉。如果有明显的不适症状，比如胸闷、呼吸困难、心率偏快，突然之间近期出现心率减慢这种情况，就要进一步查明导致心率减慢的原因，比如是否由于发生甲状腺功能减退、高钾血症，因为这些情况都可能继发引起心率减慢。建议就医做心电图进一步检查");
         } else if (healthAnalysisReq.getHeartRate() < 60) {
@@ -64,7 +64,7 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
         //人体正常情况下体温都是正常的，所以将正常体温提至if判断里面,满足此条件，后面的条件将不在判断，提升性能
         if (healthAnalysisReq.getTemperature() >= 35.8 && healthAnalysisReq.getTemperature() <= 37.6) {
             analysisString.append("体温正常！");
-            flag = true;
+            flag++;
         } else if (healthAnalysisReq.getTemperature() < 35) {
             analysisString.append("体温低于35度!!! 属于低体温症，请及时就医！");
         } else if (healthAnalysisReq.getTemperature() < 35.8) {
@@ -72,9 +72,9 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
         } else if (healthAnalysisReq.getTemperature() < 38) {
             analysisString.append("体温有点高呀！身体有点低热，多喝热水，注意休息，适当采取物理降温方式，必要时可以吃点退烧药！");
         } else {
-            analysisString.append("体温异常！体温异常！请立即就医！请立即就医！！！");
+            analysisString.append("体温太高了！建议您立即就医！！！");
         }
-        if (flag) {
+        if (flag == 3) {
             analysisString.append("建议保持规律的作息生活，正常的饮食习惯，勤加锻炼，继续保持健康生活哟！！！");
         }
         //封装analysis对象将他插入到表中
