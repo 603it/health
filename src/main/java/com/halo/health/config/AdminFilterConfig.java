@@ -20,6 +20,7 @@ public class AdminFilterConfig {
     public FilterRegistrationBean adminFilterConfig() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
         filterRegistrationBean.setFilter(adminFilter());
+        //凡是带有/admin/的接口路径都会被拦截，使用adminFilter来鉴权处理
         filterRegistrationBean.addUrlPatterns("/admin/*");
         filterRegistrationBean.setName("adminFilterConf");
         return filterRegistrationBean;

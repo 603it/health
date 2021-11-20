@@ -21,4 +21,7 @@ public class UpdateUserReq {
 
     @NotNull(message = "体重不能为空！")
     private Integer weight;
+
+    @NotNull(message = "病史不能为空，没有填无！")
+    private String medicalHistory;
 }

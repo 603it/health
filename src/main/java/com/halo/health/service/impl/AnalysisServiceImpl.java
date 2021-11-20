@@ -4,22 +4,23 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.halo.health.common.Pageing;
 import com.halo.health.exception.HaloMallException;
 import com.halo.health.exception.HaloMallExceptionEnum;
 import com.halo.health.filter.UserFilter;
+import com.halo.health.model.dao.AnalysisMapper;
 import com.halo.health.model.pojo.Analysis;
-import com.halo.health.model.pojo.User;
 import com.halo.health.model.request.HealthAnalysisReq;
 import com.halo.health.model.vo.AnalysisVO;
-import com.halo.health.common.Pageing;
 import com.halo.health.service.AnalysisService;
-import com.halo.health.model.dao.AnalysisMapper;
 import com.halo.health.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
@@ -31,12 +32,6 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
     @Autowired
     UserService userService;
 
-    /**
-     * 健康分析核心算法
-     *
-     * @param healthAnalysisReq
-     * @return
-     */
     @Override
     public Analysis analysis(HealthAnalysisReq healthAnalysisReq) {
         StringBuilder analysisString = new StringBuilder();
@@ -130,6 +125,7 @@ public class AnalysisServiceImpl extends ServiceImpl<AnalysisMapper, Analysis>
         return listTransformation(analysisList);
     }
 
+    //私有方法用于List<T>类型的列表对象拷贝
     private List<AnalysisVO> listTransformation(List<Analysis> analysisList) {
         List<AnalysisVO> analysisVOList = new ArrayList<>();
         analysisList.forEach(analysis -> {

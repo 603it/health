@@ -13,12 +13,13 @@
             <result property="gender" column="gender" jdbcType="VARCHAR"/>
             <result property="height" column="height" jdbcType="INTEGER"/>
             <result property="weight" column="weight" jdbcType="INTEGER"/>
+            <result property="medicalHistory" column="medicalHistory" jdbcType="VARCHAR"/>
             <result property="role" column="role" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,username,password,
         nickname,age,gender,
-        height,weight,`role`
+        height,weight,medicalHistory,`role`
     </sql>
 </mapper>

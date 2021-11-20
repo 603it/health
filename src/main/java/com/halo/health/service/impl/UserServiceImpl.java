@@ -44,6 +44,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public void register(String username, String password) {
+        /**
+         * 根据用户名查找数据库中是否有已注册的用户，有就抛出异常，提示前端页面，该用户名已经注册
+         * 没有则将密码加密、设置为普通用户后
+         * 将User对象保存到数据库中
+         */
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
         User user = userMapper.selectOne(queryWrapper);
@@ -52,6 +57,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         user = new User();
         user.setUsername(username);
+        //这里密码进行的MD5加密
         user.setPassword(Md5Util.jm(password));
         user.setRole(1);
         userMapper.insert(user);
@@ -69,17 +75,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return user;
     }
 
+    /**
+     * 更新用户信息
+     * @param updateUserReq
+     */
     @Override
     public void updateInformation(UpdateUserReq updateUserReq) {
         //从session中获取user信息
         User currentUser = UserFilter.currentUser;
-        log.info("updateInformation——user拷贝前:"+currentUser.toString());
+        //log.info("updateInformation——user拷贝前:"+currentUser.toString());
         BeanUtils.copyProperties(updateUserReq,currentUser);
-        log.info("updateInformation——user拷贝后:"+currentUser.toString());
+        //log.info("updateInformation——user拷贝后:"+currentUser.toString());
 
         userMapper.updateById(currentUser);
     }
 
+    /**
+     * 用户更改密码
+     * @param changePasswordReq
+     */
     @Override
     public void changePassword(ChangePasswordReq changePasswordReq) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -93,6 +107,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userMapper.updateById(currentUser);
     }
 
+    /**
+     * 查询所有用户信息
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     @Override
     public IPage<User> listOfUser(Integer pageNum, Integer pageSize) {
         //分页查询
@@ -101,6 +121,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return analysisIPage;
     }
 
+    /**
+     * 获取用户详情信息
+     * @param username
+     * @return
+     */
     @Override
     public UserAndAnalysisVO getUserInfoDetail(String username) {
         User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));

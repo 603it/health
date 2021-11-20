@@ -57,6 +57,11 @@ public class User implements Serializable {
     private Integer weight;
 
     /**
+     * 病史
+     */
+    private String medicalHistory;
+
+    /**
      * 用户角色 1是普通用户2是管理员
      */
     private Integer role;
